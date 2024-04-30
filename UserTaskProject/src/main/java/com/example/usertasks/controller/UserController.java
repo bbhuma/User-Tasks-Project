@@ -3,6 +3,7 @@ package com.example.usertasks.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,6 +42,7 @@ public class UserController {
     public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
         UserDTO createdUser = userService.createUser(userDTO);
         return ResponseEntity.ok(createdUser);
+         //return new ResponseEntity<UserDTO>(userService.createUser(createdUser),HttpStatus.CREATED)
     }
 
     @GetMapping
@@ -67,17 +69,18 @@ public class UserController {
         return ResponseEntity.ok(loggedInUser);
     }
 
-    @PostMapping("/{userId}/tasks")
-    public ResponseEntity<TaskDTO> assignTask(@PathVariable Long userId, @RequestBody TaskDTO taskDTO) {
-        TaskDTO assignedTask = taskService.assignTask(userId, taskDTO);
-        return ResponseEntity.ok(assignedTask);
-    }
+	/*
+	 * @PostMapping("/{userId}/tasks") public ResponseEntity<TaskDTO>
+	 * assignTask(@PathVariable Long userId, @RequestBody TaskDTO taskDTO) { TaskDTO
+	 * assignedTask = taskService.assignTask(userId, taskDTO); return
+	 * ResponseEntity.ok(assignedTask); }
+	 */
 
-    @GetMapping("/{userId}/tasks")
-    public ResponseEntity<List<TaskDTO>> getAllTasksByUser(@PathVariable Long userId) {
-        List<TaskDTO> tasks = taskService.getAllTasksByUser(userId);
-        return ResponseEntity.ok(tasks);
-    }
+	/*
+	 * @GetMapping("/{userId}/tasks") public ResponseEntity<List<TaskDTO>>
+	 * getAllTasksByUser(@PathVariable Long userId) { List<TaskDTO> tasks =
+	 * taskService.getAllTasksByUser(userId); return ResponseEntity.ok(tasks); }
+	 */
 
     @GetMapping("/{userId}/tasks/{taskId}")
     public ResponseEntity<TaskDTO> getTask(@PathVariable Long userId, @PathVariable Long taskId) {
@@ -85,17 +88,19 @@ public class UserController {
         return ResponseEntity.ok(task);
     }
 
-    @PutMapping("/{userId}/tasks/{taskId}")
-    public ResponseEntity<TaskDTO> updateTask(@PathVariable Long userId, @PathVariable Long taskId, @RequestBody TaskDTO taskDTO) {
-        TaskDTO updatedTask = taskService.updateTask(userId, taskId, taskDTO);
-        return ResponseEntity.ok(updatedTask);
-    }
+	/*
+	 * @PutMapping("/{userId}/tasks/{taskId}") public ResponseEntity<TaskDTO>
+	 * updateTask(@PathVariable Long userId, @PathVariable Long taskId, @RequestBody
+	 * TaskDTO taskDTO) { TaskDTO updatedTask = taskService.updateTask(userId,
+	 * taskId, taskDTO); return ResponseEntity.ok(updatedTask); }
+	 */
 
-    @DeleteMapping("/{userId}/tasks/{taskId}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Long userId, @PathVariable Long taskId) {
-        taskService.deleteTask(userId, taskId);
-        return ResponseEntity.noContent().build();
-    }
+	/*
+	 * @DeleteMapping("/{userId}/tasks/{taskId}") public ResponseEntity<Void>
+	 * deleteTask(@PathVariable Long userId, @PathVariable Long taskId) {
+	 * taskService.deleteTask(userId, taskId); return
+	 * ResponseEntity.noContent().build(); }
+	 */
 
     @DeleteMapping("/{userId}/tasks")
     public ResponseEntity<Void> deleteAllTasksByUser(@PathVariable Long userId) {

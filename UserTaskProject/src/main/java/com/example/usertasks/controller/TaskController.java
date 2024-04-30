@@ -37,11 +37,11 @@ public class TaskController {
     }
 
     // Handler method to retrieve a specific task by ID
-    @GetMapping("/{taskId}")
-    public ResponseEntity<TaskDTO> getTaskById(@PathVariable Long userId, @PathVariable Long taskId) {
-        TaskDTO task = taskService.getTask(userId, taskId);
-        return ResponseEntity.ok(task);
-    }
+	/*
+	 * @GetMapping("/{taskId}") public ResponseEntity<TaskDTO>
+	 * getTaskById(@PathVariable Long userId, @PathVariable Long taskId) { TaskDTO
+	 * task = taskService.getTask(userId, taskId); return ResponseEntity.ok(task); }
+	 */
 
     // Handler method to update a task
     @PutMapping("/{taskId}")

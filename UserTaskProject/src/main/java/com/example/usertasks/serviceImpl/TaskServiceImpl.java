@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.usertasks.entity.Task;
+import com.example.usertasks.entity.User;
 import com.example.usertasks.exception.ResourceNotFoundException;
 import com.example.usertasks.payloadDTO.TaskDTO;
 import com.example.usertasks.repository.TaskRepository;
@@ -84,27 +85,32 @@ public class TaskServiceImpl implements TaskService {
         taskRepository.delete(task);
     }
 
-	@Override
-	public TaskDTO getTask(Long userId, Long taskId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public TaskDTO getTask(Long userId, Long taskId) {
+        Task task = taskRepository.findByIdAndUserId(taskId,userId);
+        return (task != null) ? modelMapper.map(task, TaskDTO.class) : null;
+    }
 
-	@Override
-	public List<TaskDTO> getAllTasksByUser(Long userId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public List<TaskDTO> getAllTasksByUser(Long userId) {
+        List<Task> tasks = taskRepository.findByUserId(userId);
+        return tasks.stream()
+                .map(task -> modelMapper.map(task, TaskDTO.class))
+                .collect(Collectors.toList());
+    }
 
-	@Override
-	public TaskDTO assignTask(Long userId, TaskDTO taskDTO) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public TaskDTO assignTask(Long userId, TaskDTO taskDTO) {
+        Task task = modelMapper.map(taskDTO, Task.class);
+        User user = new User(); // Assuming you have a way to fetch the user object by userId
+        user.setId(userId); // Set the ID of the user
+        task.setUser(user); // Set the user in the task
+        task = taskRepository.save(task);
+        return modelMapper.map(task, TaskDTO.class);
+    }
 
-	@Override
-	public void deleteAllTasksByUser(Long userId) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void deleteAllTasksByUser(Long userId) {
+        taskRepository.deleteByUserId(userId);
+    }
 }
