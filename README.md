@@ -20,3 +20,5 @@ TaskController:
 GET /api/tasks/{taskId} - Get details of specific task
 GET /api/users/{userId}/tasks - Get tasks of a particular user with id
 So, in total, you would need two controllers, one for User related endpoints and one for Task related endpoints.
+
+<img width="878" alt="image" src="https://github.com/bbhuma/User-Tasks-Project/assets/25493400/9f9457b2-7630-41d7-ba1e-41a2144117af">
