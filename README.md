@@ -3,6 +3,21 @@ Tasks assigned to different Users, @ManyToOne tasks to user entitiy
 
 Spring boot project with @ManyToOne Detailed discussion DTO based backend api development  https://chat.openai.com/share/3021e959-b1a4-49c8-a5e7-dfe004b705a5 
 
+Write SQL queries - 
+USE usertasks;
+
+SELECT * from task where user_id=1;
+
+SELECT * FROM task INNER JOIN user ON task.user_id = user.id where user.id=1;
+
+SELECT * FROM task WHERE user_id = 1 AND id = 9;
+
+User controller for handling User end point like - /api/users/{user_id}
+Task controller for handling task endpoints like - /api/users/{user_id}/tasks/{task_id} 
+- All the end points in Task controller takes and  gives you Task Object or TaskDTO object.
+- Task Class has User reference, so always find userById then assign the User object to the Task Object.
+- set id, taskname from the i/p taskDTO object.
+- 
 Can you create two contorllers called userController and Task controller in a one to many relationship between User and Tasks. with feilds as id,nam,email on User and id, name on tasks. The follwing end points should be implemented 
 POST /api/users - Create new User
 GET /api/users - Get all Users
