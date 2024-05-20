@@ -6,9 +6,13 @@ Spring boot project with @ManyToOne Detailed discussion DTO based backend api de
 Write SQL queries - 
 USE usertasks;
 
-SELECT * from task where user_id=1;
+SELECT * from task where user_id=1;----> this is more appropriate for /api/users/1/tasks
+![image](https://github.com/bbhuma/User-Tasks-Project/assets/25493400/24330de3-f19a-4ae7-b65a-c1c68ee62f10)
+
 
 SELECT * FROM task INNER JOIN user ON task.user_id = user.id where user.id=1;
+![Uploading image.png…]()
+
 
 SELECT * FROM task WHERE user_id = 1 AND id = 9;
 
