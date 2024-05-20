@@ -16,15 +16,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Task {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    private String taskName;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+	private String taskName;
+
+	@ManyToOne
+	@JoinColumn(name = "user_id") // user_id means the Id coloumn of user table, and the name does not matter.
+	private User user;
 
 	public Long getId() {
 		return id;
@@ -68,11 +68,11 @@ public class Task {
 		// TODO Auto-generated constructor stub
 	}
 
+	//Make sure oyu have this method to be able to call the exception method. 
 	public Task orElseThrow(Object object) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-    
 
-    // Constructors, getters, and setters
+	// Constructors, getters, and setters
 }

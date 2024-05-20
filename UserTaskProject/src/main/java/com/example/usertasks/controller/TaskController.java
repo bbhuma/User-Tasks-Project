@@ -1,8 +1,11 @@
 package com.example.usertasks.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,47 +16,126 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.usertasks.entity.Task;
+import com.example.usertasks.entity.User;
+import com.example.usertasks.exception.ResourceNotFoundException;
 import com.example.usertasks.payloadDTO.TaskDTO;
-import com.example.usertasks.service.TaskService;
+import com.example.usertasks.repository.TaskRepository;
+import com.example.usertasks.repository.UserRepository;
 
 @RestController
-@RequestMapping("/api/users/{userId}/tasks")
+@RequestMapping("/api/users/{user_id}/tasks")
 public class TaskController {
 	@Autowired
-    private  TaskService taskService;
+	TaskRepository taskRepository;
 
-    // Handler method to assign a new task to a user
-    @PostMapping
-    public ResponseEntity<TaskDTO> assignTask(@PathVariable Long userId, @RequestBody TaskDTO taskDTO) {
-        TaskDTO assignedTask = taskService.assignTask(userId, taskDTO);
-        return ResponseEntity.ok(assignedTask);
-    }
+	@Autowired
+	ModelMapper modelMapper;
 
-    // Handler method to retrieve all tasks of a user
-    @GetMapping
-    public ResponseEntity<List<TaskDTO>> getAllTasksByUser(@PathVariable Long userId) {
-        List<TaskDTO> tasks = taskService.getAllTasksByUser(userId);
-        return ResponseEntity.ok(tasks);
-    }
+	@Autowired
+	UserRepository userRepository;
 
-    // Handler method to retrieve a specific task by ID
-	/*
-	 * @GetMapping("/{taskId}") public ResponseEntity<TaskDTO>
-	 * getTaskById(@PathVariable Long userId, @PathVariable Long taskId) { TaskDTO
-	 * task = taskService.getTask(userId, taskId); return ResponseEntity.ok(task); }
-	 */
+//	@Autowired, you can not autowire an entity, it is not managed by spring, it is managed by JPA. 
+//	Task task;
 
-    // Handler method to update a task
-    @PutMapping("/{taskId}")
-    public ResponseEntity<TaskDTO> updateTask(@PathVariable Long userId, @PathVariable Long taskId, @RequestBody TaskDTO taskDTO) {
-        TaskDTO updatedTask = taskService.updateTask(userId, taskId, taskDTO);
-        return ResponseEntity.ok(updatedTask);
-    }
+	@PostMapping
+	public ResponseEntity<TaskDTO> assignTask(@RequestBody TaskDTO taskDTO, @PathVariable Long user_id) {
 
-    // Handler method to delete a task
-    @DeleteMapping("/{taskId}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Long userId, @PathVariable Long taskId) {
-        taskService.deleteTask(userId, taskId);
-        return ResponseEntity.noContent().build();
-    }
+		// Hanlde exceptions of no
+		if (!userRepository.existsById(user_id)) {
+			throw new ResourceNotFoundException(
+					"User alaready exists with same id and can not be duplicated  with id " + user_id);
+		}
+//	    Task task = new Task();
+		// Convert DTO to entity
+		Task task = modelMapper.map(taskDTO, Task.class);
+		task.setUser(userRepository.findById(user_id)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found with id " + user_id)));
+
+		// Save the task
+		Task newTask = taskRepository.save(task);
+
+		// Convert entity back to DTO
+		TaskDTO newDTO = modelMapper.map(newTask, TaskDTO.class);
+
+		return new ResponseEntity<>(newDTO, HttpStatus.CREATED);
+	}
+
+	@GetMapping()
+	public ResponseEntity<List<TaskDTO>> getAllTask(@PathVariable Long user_id) {
+
+		// When you use ok(), you dont need to pass status code, ok already have 200 as
+		// build in.
+		List<Task> tasks = taskRepository.findByUserId(user_id);
+
+		// Dont forget to collect the tasks into a new collection called newTasks.
+		List<TaskDTO> newTasks = tasks.stream().map(task -> modelMapper.map(task, TaskDTO.class))
+				.collect(Collectors.toList());
+		return ResponseEntity.ok(newTasks);
+	}
+
+	// Id is the id of Task and user_id os the Id name of the User, it does not
+	// matter what names is given to User Id.
+	@GetMapping("/{task_id}")
+	public ResponseEntity<TaskDTO> getTaskById(@PathVariable Long user_id, @PathVariable Long task_id) {
+
+		// handle the exception for no valid task found, with id
+		if (!userRepository.existsById(user_id)) {
+			throw new ResourceNotFoundException("User not found with id " + user_id);
+		}
+		/*
+		 * Task task = taskRepository.findByIdAndUserId(taskId, userId) .orElseThrow(()
+		 * -> new ResourceNotFoundException("Task not found for this id and user"));
+		 * taskRepository.delete(task);
+		 */
+		
+		// else return the Res Entity with the right task found.
+		return ResponseEntity.ok(modelMapper.map(taskRepository.findByIdAndUserId(task_id, user_id), TaskDTO.class));
+	}
+
+	@PutMapping("/{task_id}")
+	public ResponseEntity<TaskDTO> updateTaskById(@PathVariable Long user_id, @PathVariable Long task_id,
+			@RequestBody TaskDTO taskDTO) {
+		// handle the exception for no valid task found, with id
+		if (!userRepository.existsById(user_id)) {
+			throw new ResourceNotFoundException("User not found with id " + user_id);
+		}
+
+		
+		/*
+		 * Task task = taskRepository.findByIdAndUserId(task_id, user_id)
+		 * .orElseThrow(() -> new
+		 * ResourceNotFoundException("Task not found for this id and user"));
+		 * taskRepository.delete(task);
+		 */
+		 
+		User user = userRepository.findById(user_id).get();
+		Task task = new Task();
+		task.setId(taskDTO.getId());
+		task.setTaskName(taskDTO.getTaskName());
+		task.setUser(user);
+		taskRepository.save(task);
+
+		return ResponseEntity.ok(modelMapper.map(task, TaskDTO.class));
+	}
+
+	@DeleteMapping("/{task_id}")
+	public ResponseEntity<Void> deleteTaskById(@PathVariable Long user_id, @PathVariable Long task_id) {
+
+		  // handle the exception for no valid task found, with id
+		  if (!userRepository.existsById(user_id)) { throw new
+		  ResourceNotFoundException("User not found with id " + user_id); }
+		  taskRepository.deleteById(task_id);
+		 
+		/*
+		 * Task task = taskRepository.findByIdAndUserId (task_id, user_id)
+		 * .orElseThrow(() -> new
+		 * ResourceNotFoundException("Task not found for this id and user"));
+		 * taskRepository.delete(task);
+		 */
+		 
+
+		return ResponseEntity.noContent().build();
+	}
+
 }
